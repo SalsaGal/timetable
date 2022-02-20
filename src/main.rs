@@ -32,13 +32,13 @@ fn main() {
     // Load the file
     let mut file_path = home::home_dir().unwrap();
     file_path.push(".timetable");
-    let file_text = read_to_string(&file_path).unwrap_or_else(|_| {
-        let mut file = File::create(&file_path).unwrap();
-        let contents = serde_json::to_string_pretty(&Timetable::default()).unwrap();
-        file.write_all(contents.as_bytes()).unwrap();
-        read_to_string(&file_path).unwrap()
-    });
-    let mut timetable: Timetable = serde_json::from_str(&file_text).unwrap();
+    let mut timetable = if let Ok(text) = read_to_string(&file_path) {
+        serde_json::from_str(&text).unwrap()
+    } else {
+        File::create(&file_path).unwrap();
+        changed = true;
+        Timetable::default()
+    };
 
     for class in args.add_class {
         timetable.classes.push(Class {
