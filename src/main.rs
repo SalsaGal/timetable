@@ -132,21 +132,22 @@ fn main() {
                 Some(max)
             }
         };
+        let day_count = *timetable.timetable.keys().max().unwrap_or(&0) + 1;
 
         match longest_day_length {
             None => println!("No timetable made!"),
             Some(longest_day_length) => {
-                for i in 0..timetable.timetable.len() {
-                    print!("Day {i}\t");
+                for i in 0..day_count {
+                    print!("Day {i}\t\t");
                 }
                 println!();
                 for period in 0..longest_day_length {
                     let period = period as usize;
-                    for day in 0..timetable.timetable.len() {
+                    for day in 0..day_count {
                         if let Some(class) = timetable.get_class(day, period) {
                             print!("{}", class.name);
                         }
-                        print!("\t");
+                        print!("\t\t");
                     }
                     println!()
                 }
