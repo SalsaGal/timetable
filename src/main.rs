@@ -1,5 +1,7 @@
 use std::fs::{read_to_string, File, remove_file};
 use std::io::Write;
+use std::path::PathBuf;
+use std::str::FromStr;
 
 use clap::StructOpt;
 
@@ -23,6 +25,9 @@ struct Args {
     /// Add a class
     #[clap(short, long)]
     add_class: Vec<String>,
+
+    /// Use a different configuration path (defaults to ~/.timetable)
+    config: Option<String>,
 }
 
 fn main() {
@@ -30,8 +35,13 @@ fn main() {
     let mut changed = false;
 
     // Load the file
-    let mut file_path = home::home_dir().unwrap();
-    file_path.push(".timetable");
+    let file_path = if let Some(config) = args.config {
+        PathBuf::from_str(&config).unwrap()
+    } else {
+        let mut file_path = home::home_dir().unwrap();
+        file_path.push(".timetable");
+        file_path
+    };
     let mut timetable = if let Ok(text) = read_to_string(&file_path) {
         serde_json::from_str(&text).unwrap()
     } else {
