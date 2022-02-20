@@ -9,7 +9,7 @@ use clap::StructOpt;
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 struct Timetable {
     classes: Vec<Class>,
-    timetable: HashMap<(usize, usize), usize>,
+    timetable: HashMap<usize, HashMap<usize, usize>>,
 }
 
 impl Timetable {
@@ -23,11 +23,20 @@ impl Timetable {
     }
 
     fn get_class(&self, day: usize, period: usize) -> Option<&Class> {
-        if let Some(index) = self.timetable.get(&(day, period)) {
-            self.classes.get(*index)
+        if let Some(day) = self.timetable.get(&day) {
+            if let Some(index) = day.get(&period) {
+                self.classes.get(*index)
+            } else {
+                None
+            }
         } else {
             None
         }
+    }
+
+    fn add_period(&mut self, class: usize, day: usize, period: usize) {
+        let day = self.timetable.entry(day).or_default();
+        day.insert(period, class);
     }
 }
 
@@ -95,7 +104,7 @@ fn main() {
             if let Some(class) = timetable.class_index_from_name(name) {
                 if let Ok(day) = day.parse() {
                     if let Ok(period) = period.parse() {
-                        timetable.timetable.insert((day, period), class);
+                        timetable.add_period(class, day, period);
                         changed = true;
                     } else {
                         eprintln!("Day is in invalid format (must be a number)!");
@@ -112,11 +121,20 @@ fn main() {
     }
 
     if args.timetable {
-        let longest_day_length = timetable.timetable.iter().map(|((_, period), _)| *period).max();
+        let longest_day_length = {
+            if timetable.timetable.is_empty() {
+                None
+            } else {
+                let mut max = 0;
+                for day in timetable.timetable.values() {
+                    max = usize::max(max, day.len());
+                }
+                Some(max)
+            }
+        };
 
         match longest_day_length {
             None => println!("No timetable made!"),
-            Some(0) => println!("All days are empty!"),
             Some(longest_day_length) => {
                 for i in 0..timetable.timetable.len() {
                     print!("Day {i}\t");
