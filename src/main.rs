@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::{read_to_string, File, remove_file};
 use std::io::Write;
 use std::path::PathBuf;
@@ -8,17 +9,13 @@ use clap::StructOpt;
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 struct Timetable {
     classes: Vec<Class>,
-    days: Vec<Vec<usize>>,
+    timetable: HashMap<(usize, usize), usize>,
 }
 
 impl Timetable {
     fn get_class(&self, day: usize, period: usize) -> Option<&Class> {
-        if let Some(day) = self.days.get(day) {
-            if let Some(period) = day.get(period) {
-                self.classes.get(*period)
-            } else {
-                None
-            }
+        if let Some(index) = self.timetable.get(&(day, period)) {
+            self.classes.get(*index)
         } else {
             None
         }
@@ -75,30 +72,19 @@ fn main() {
     }
 
     if args.timetable {
-        let longest_day_length = {
-            let mut i = 0;
-            'check_loop: loop {
-                for day in &timetable.days {
-                    if day.len() as isize >= i {
-                        i += 1;
-                        continue 'check_loop;
-                    }
-                }
-                break i - 1;
-            }
-        };
+        let longest_day_length = timetable.timetable.iter().map(|((_, period), _)| *period).max();
 
         match longest_day_length {
-            -1 => println!("No timetable made!"),
-            0 => println!("All days are empty!"),
-            _ => {
-                for i in 0..timetable.days.len() {
+            None => println!("No timetable made!"),
+            Some(0) => println!("All days are empty!"),
+            Some(longest_day_length) => {
+                for i in 0..timetable.timetable.len() {
                     print!("Day {i}\t");
                 }
                 println!();
                 for period in 0..longest_day_length {
                     let period = period as usize;
-                    for day in 0..timetable.days.len() {
+                    for day in 0..timetable.timetable.len() {
                         if let Some(class) = timetable.get_class(day, period) {
                             print!("{}", class.name);
                         }
