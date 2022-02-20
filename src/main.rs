@@ -21,17 +21,16 @@ struct Args {
 }
 
 fn main() {
+    let args = Args::parse();
+
     let mut file_path = home::home_dir().unwrap();
     file_path.push(".timetable");
 
-    if let Ok(text) = read_to_string(&file_path) {
-        // Try to load timetable info
-    } else {
-        // Create timetable info
+    let file_text = read_to_string(&file_path).unwrap_or_else(|_| {
         let mut file = File::create(&file_path).unwrap();
         let contents = serde_json::to_string_pretty(&Timetable::default()).unwrap();
         file.write_all(contents.as_bytes()).unwrap();
-    }
-
-    let args = Args::parse();
+        read_to_string(&file_path).unwrap()
+    });
+    let timetable: Timetable = serde_json::from_str(&file_text).unwrap();
 }
