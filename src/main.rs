@@ -27,6 +27,7 @@ struct Args {
     add_class: Vec<String>,
 
     /// Use a different configuration path (defaults to ~/.timetable)
+    #[clap(short, long)]
     config: Option<String>,
 }
 

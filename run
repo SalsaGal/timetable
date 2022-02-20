@@ -1,9 +1,9 @@
-#- b!
+#- b
     cargo b
 #/
 
-#-
-    cargo r
+#- r
+    target/debug/timetable -c .test_timetable
 #/
 
 #help
