@@ -8,6 +8,21 @@ use clap::StructOpt;
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 struct Timetable {
     classes: Vec<Class>,
+    days: Vec<Vec<usize>>,
+}
+
+impl Timetable {
+    fn get_class(&self, day: usize, period: usize) -> Option<&Class> {
+        if let Some(day) = self.days.get(day) {
+            if let Some(period) = day.get(period) {
+                self.classes.get(*period)
+            } else {
+                None
+            }
+        } else {
+            None
+        }
+    }
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
@@ -18,9 +33,9 @@ struct Class {
 
 #[derive(clap::Parser)]
 struct Args {
-    /// List the complete timetable
+    /// List the full timetable
     #[clap(short, long)]
-    list: bool,
+    timetable: bool,
 
     /// Add a class
     #[clap(short, long)]
@@ -57,6 +72,42 @@ fn main() {
             todo: vec![],
         });
         changed = true;
+    }
+
+    if args.timetable {
+        let longest_day_length = {
+            let mut i = 0;
+            'check_loop: loop {
+                for day in &timetable.days {
+                    if day.len() as isize >= i {
+                        i += 1;
+                        continue 'check_loop;
+                    }
+                }
+                break i - 1;
+            }
+        };
+
+        match longest_day_length {
+            -1 => println!("No timetable made!"),
+            0 => println!("All days are empty!"),
+            _ => {
+                for i in 0..timetable.days.len() {
+                    print!("Day {i}\t");
+                }
+                println!();
+                for period in 0..longest_day_length {
+                    let period = period as usize;
+                    for day in 0..timetable.days.len() {
+                        if let Some(class) = timetable.get_class(day, period) {
+                            print!("{}", class.name);
+                        }
+                        print!("\t");
+                    }
+                    println!()
+                }
+            },
+        }
     }
 
     // Save the file if needed

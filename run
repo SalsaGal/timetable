@@ -3,7 +3,7 @@
 #/
 
 #- r
-    target/debug/timetable -c .test_timetable
+    target/debug/timetable -c .test_timetable -t
 #/
 
 #help

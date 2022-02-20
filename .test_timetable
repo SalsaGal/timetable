@@ -1,3 +1,16 @@
 {
-  "classes": []
+  "classes": [
+    {
+      "name": "foo",
+      "todo": []
+    },
+    {
+      "name": "bar",
+      "todo": []
+    }
+  ],
+  "days": [
+    [0, 0],
+    [1, 1, 0]
+  ]
 }
