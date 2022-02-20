@@ -3,7 +3,7 @@
 #/
 
 #- r
-    target/debug/timetable -c .test_timetable -t
+    target/debug/timetable -c .test_timetable --add-class foo --add-period foo,0,0
 #/
 
 #help

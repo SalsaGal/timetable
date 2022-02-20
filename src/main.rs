@@ -13,6 +13,15 @@ struct Timetable {
 }
 
 impl Timetable {
+    fn class_index_from_name(&self, name: &str) -> Option<usize> {
+        let class = self.classes.iter().enumerate().find(|(_, class)| class.name == name);
+        if let Some((index, _)) = class {
+            Some(index)
+        } else {
+            None
+        }
+    }
+
     fn get_class(&self, day: usize, period: usize) -> Option<&Class> {
         if let Some(index) = self.timetable.get(&(day, period)) {
             self.classes.get(*index)
@@ -35,8 +44,12 @@ struct Args {
     timetable: bool,
 
     /// Add a class
-    #[clap(short, long)]
+    #[clap(long)]
     add_class: Vec<String>,
+
+    /// Add a period, uses the format `--add-period [class name],[day],[period]`
+    #[clap(long)]
+    add_period: Vec<String>,
 
     /// Use a different configuration path (defaults to ~/.timetable)
     #[clap(short, long)]
@@ -64,11 +77,38 @@ fn main() {
     };
 
     for class in args.add_class {
+        // TODO dont allow duplicate class names
         timetable.classes.push(Class {
             name: class,
             todo: vec![],
         });
         changed = true;
+    }
+
+    for period in args.add_period {
+        let tokens: Vec<&str> = period.split(',').collect();
+        if tokens.len() == 3 {
+            let name = tokens[0];
+            let day = tokens[1];
+            let period = tokens[2];
+
+            if let Some(class) = timetable.class_index_from_name(name) {
+                if let Ok(day) = day.parse() {
+                    if let Ok(period) = period.parse() {
+                        timetable.timetable.insert((day, period), class);
+                        changed = true;
+                    } else {
+                        eprintln!("Day is in invalid format (must be a number)!");
+                    }
+                } else {
+                    eprintln!("Day is in invalid format (must be a number)!");
+                }
+            } else {
+                eprintln!("No class called {name}!");
+            }
+        } else {
+            eprintln!("--add-period takes the format of `--add-period [class name],[day],[period]`");
+        }
     }
 
     if args.timetable {
