@@ -5,3 +5,8 @@
 #-
     cargo r
 #/
+
+#help
+    cargo b
+    target/debug/timetable --help
+#/
