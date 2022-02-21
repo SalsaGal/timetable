@@ -3,10 +3,19 @@
 #/
 
 #- r
-    target/debug/timetable -c .test --add-class foo --add-period foo,0,0
+    target/debug/timetable -c .test -t
 #/
 
 #help
     cargo b
     target/debug/timetable --help
+#/
+
+#release b
+    cargo b --release
+#/
+
+#install
+    cargo b --release
+    sudo cp target/release/timetable /usr/bin/timetable
 #/
