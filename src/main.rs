@@ -121,7 +121,7 @@ fn main() {
         }
     }
 
-    if args.timetable {
+    if args.timetable || !changed {
         let longest_day_length = {
             if timetable.timetable.is_empty() {
                 None
