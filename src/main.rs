@@ -58,9 +58,13 @@ struct Args {
     #[clap(long)]
     add_class: Vec<String>,
 
-    /// Add a period, uses the format `--add-period [class name],[day],[period]`
+    /// Add a period, uses the format `-a [class name],[day],[period]`
     #[clap(short, long)]
     add_period: Vec<String>,
+
+    /// Remove a period from the timetable, uses the format `-r [day],[period]`
+    #[clap(short, long)]
+    rm_period: Vec<String>,
 
     /// Use a different configuration path (defaults to ~/.timetable)
     #[clap(short, long)]
@@ -118,7 +122,32 @@ fn main() {
                 eprintln!("No class called {name}!");
             }
         } else {
-            eprintln!("--add-period takes the format of `--add-period [class name],[day],[period]`");
+            eprintln!("-a takes the format of `-a [class name],[day],[period]`");
+        }
+    }
+
+    for period in args.rm_period {
+        let tokens: Vec<&str> = period.split(',').collect();
+        if tokens.len() == 2{
+            if let Ok(day) = tokens[0].parse() {
+                if let Ok(period) = tokens[1].parse() {
+                    if let Some(day_map) = timetable.timetable.get_mut(&day) {
+                        if day_map.remove(&period).is_some() {
+                        } else {
+                            eprintln!("No period {period} on day {day}");
+                            changed = true;
+                        }
+                    } else {
+                        eprintln!("No day {day}");
+                    }
+                } else {
+                    eprintln!("Day is in invalid format (must be a number)!");
+                }
+            } else {
+                eprintln!("Day is in invalid format (must be a number)!");
+            }
+        } else {
+            eprintln!("-r takes the format of `-r [day],[period]`");
         }
     }
 
