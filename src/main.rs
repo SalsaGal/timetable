@@ -177,6 +177,7 @@ fn main() {
     }
 
     if args.timetable || !changed {
+        // I think i did this a bit stupidly
         let day_bounds = {
             if timetable.timetable.is_empty() {
                 None
@@ -192,19 +193,20 @@ fn main() {
                 Some((max, min))
             }
         };
-        let day_count = *timetable.timetable.keys().max().unwrap_or(&0) + 1;
+        let day_max = timetable.timetable.keys().max();
+        let day_min = timetable.timetable.keys().min();
 
-        match day_bounds {
-            None => println!("No timetable made!"),
-            Some((latest_period, earliest_period)) => {
+        if let Some((latest_period, earliest_period)) = day_bounds {
+            if let Some(day_max) = day_max {
+                let day_min = day_min.unwrap();
                 let mut table = vec![];
                 let mut title = vec!["".cell()];
-                for day in 0..day_count {
+                for day in *day_min..*day_max + 1 {
                     title.push(format!("Day {day}").cell().bold(true));
                 }
                 for period in earliest_period..latest_period + 1 {
                     table.push(vec![format!("Period {period}").cell().bold(true)]);
-                    for day in 0..day_count {
+                    for day in *day_min..*day_max + 1 {
                         let cell = period - earliest_period;
                         if let Some(class) = timetable.get_class(day, period) {
                             table[cell].push((&class.name).cell());
@@ -213,9 +215,13 @@ fn main() {
                         }
                     }
                 }
-
+    
                 print_stdout(table.table().title(title)).unwrap();
-            },
+            } else {
+                eprintln!("No days in timetable!");
+            }
+        } else {
+            println!("No timetable made!")
         }
     }
 
