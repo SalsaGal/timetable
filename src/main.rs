@@ -47,6 +47,7 @@ struct Class {
     todo: Vec<String>,
 }
 
+/// Run without arguments to simply print the timetable
 #[derive(clap::Parser)]
 struct Args {
     /// List the full timetable
