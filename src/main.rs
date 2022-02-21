@@ -1,3 +1,5 @@
+mod mass_add;
+
 use std::collections::HashMap;
 use std::fs::{read_to_string, File, remove_file};
 use std::io::Write;
@@ -6,11 +8,12 @@ use std::str::FromStr;
 
 use clap::StructOpt;
 use cli_table::{Cell, Table, print_stdout, Style};
+use mass_add::mass_add;
 
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
-struct Timetable {
-    classes: Vec<Class>,
-    timetable: HashMap<usize, HashMap<usize, usize>>,
+pub struct Timetable {
+    pub classes: Vec<Class>,
+    pub timetable: HashMap<usize, HashMap<usize, usize>>,
 }
 
 impl Timetable {
@@ -42,9 +45,18 @@ impl Timetable {
 }
 
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
-struct Class {
+pub struct Class {
     name: String,
     todo: Vec<String>,
+}
+
+impl Class {
+    pub fn new(name: String) -> Self {
+        Self {
+            name,
+            todo: vec![],
+        }
+    }
 }
 
 /// Run without arguments to simply print the timetable
@@ -69,6 +81,9 @@ struct Args {
     /// Use a different configuration path (defaults to ~/.timetable)
     #[clap(short, long)]
     config: Option<String>,
+
+    #[clap(short, long)]
+    mass_add_period: bool,
 }
 
 fn main() {
@@ -149,6 +164,11 @@ fn main() {
         } else {
             eprintln!("-r takes the format of `-r [day],[period]`");
         }
+    }
+
+    if args.mass_add_period {
+        mass_add(&mut timetable);
+        changed = true;
     }
 
     if args.timetable || !changed {
