@@ -3,7 +3,7 @@
 #/
 
 #- r
-    target/debug/timetable -c .test -t
+    target/debug/timetable -c .max -t
 #/
 
 #help

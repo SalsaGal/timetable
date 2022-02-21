@@ -176,34 +176,39 @@ fn main() {
     }
 
     if args.timetable || !changed {
-        let longest_day_length = {
+        let day_bounds = {
             if timetable.timetable.is_empty() {
                 None
             } else {
                 let mut max = 0;
+                let mut min = usize::MAX;
                 for day in timetable.timetable.values() {
-                    max = usize::max(max, day.len());
+                    if !day.is_empty() {
+                        max = usize::max(max, *day.keys().max().unwrap_or(&0));
+                        min = usize::min(min, *day.keys().min().unwrap_or(&0));
+                    }
                 }
-                Some(max)
+                Some((max, min))
             }
         };
         let day_count = *timetable.timetable.keys().max().unwrap_or(&0) + 1;
 
-        match longest_day_length {
+        match day_bounds {
             None => println!("No timetable made!"),
-            Some(longest_day_length) => {
+            Some((latest_period, earliest_period)) => {
                 let mut table = vec![];
                 let mut title = vec!["".cell()];
                 for day in 0..day_count {
                     title.push(format!("Day {day}").cell().bold(true));
                 }
-                for period in 0..longest_day_length {
+                for period in earliest_period..latest_period + 1 {
                     table.push(vec![format!("Period {period}").cell().bold(true)]);
                     for day in 0..day_count {
+                        let cell = period - earliest_period;
                         if let Some(class) = timetable.get_class(day, period) {
-                            table[period].push((&class.name).cell());
+                            table[cell].push((&class.name).cell());
                         } else {
-                            table[period].push("".cell());
+                            table[cell].push("".cell());
                         }
                     }
                 }
