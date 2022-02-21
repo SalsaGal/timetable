@@ -58,7 +58,7 @@ struct Args {
     add_class: Vec<String>,
 
     /// Add a period, uses the format `--add-period [class name],[day],[period]`
-    #[clap(long)]
+    #[clap(short, long)]
     add_period: Vec<String>,
 
     /// Use a different configuration path (defaults to ~/.timetable)
