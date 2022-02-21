@@ -82,6 +82,7 @@ struct Args {
     #[clap(short, long)]
     config: Option<String>,
 
+    /// Enter another menu to add several periods without typing in the full command each time.
     #[clap(short, long)]
     mass_add_period: bool,
 }
