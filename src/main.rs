@@ -137,11 +137,13 @@ fn main() {
         match longest_day_length {
             None => println!("No timetable made!"),
             Some(longest_day_length) => {
+                print!("\t\t");
                 for i in 0..day_count {
                     print!("Day {i}\t\t");
                 }
                 println!();
                 for period in 0..longest_day_length {
+                    print!("Period {period}\t");
                     let period = period as usize;
                     for day in 0..day_count {
                         if let Some(class) = timetable.get_class(day, period) {
