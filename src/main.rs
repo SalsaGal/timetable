@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 use clap::StructOpt;
+use cli_table::{Cell, Table, print_stdout};
 
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 struct Timetable {
@@ -137,22 +138,23 @@ fn main() {
         match longest_day_length {
             None => println!("No timetable made!"),
             Some(longest_day_length) => {
-                print!("\t\t");
-                for i in 0..day_count {
-                    print!("Day {i}\t\t");
+                let mut table = vec![];
+                let mut title = vec!["".cell()];
+                for day in 0..day_count {
+                    title.push(format!("Day {day}").cell());
                 }
-                println!();
                 for period in 0..longest_day_length {
-                    print!("Period {period}\t");
-                    let period = period as usize;
+                    table.push(vec![format!("Period {period}").cell()]);
                     for day in 0..day_count {
                         if let Some(class) = timetable.get_class(day, period) {
-                            print!("{}", class.name);
+                            table[period].push((&class.name).cell());
+                        } else {
+                            table[period].push("".cell());
                         }
-                        print!("\t\t");
                     }
-                    println!()
                 }
+
+                print_stdout(table.table().title(title)).unwrap();
             },
         }
     }
