@@ -18,6 +18,7 @@ OPTIONS:
         --add-class <ADD_CLASS>      Add a class
     -c, --config <CONFIG>            Use a different configuration path (defaults to ~/.timetable)
     -h, --help                       Print help information
+    -m, --mass-add-period            
     -r, --rm-period <RM_PERIOD>      Remove a period from the timetable, uses the format `-r
                                      [day],[period]`
     -t, --timetable                  List the full timetable
