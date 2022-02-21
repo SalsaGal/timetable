@@ -5,7 +5,7 @@ use std::path::PathBuf;
 use std::str::FromStr;
 
 use clap::StructOpt;
-use cli_table::{Cell, Table, print_stdout};
+use cli_table::{Cell, Table, print_stdout, Style};
 
 #[derive(Debug, Default, serde::Serialize, serde::Deserialize)]
 struct Timetable {
@@ -141,10 +141,10 @@ fn main() {
                 let mut table = vec![];
                 let mut title = vec!["".cell()];
                 for day in 0..day_count {
-                    title.push(format!("Day {day}").cell());
+                    title.push(format!("Day {day}").cell().bold(true));
                 }
                 for period in 0..longest_day_length {
-                    table.push(vec![format!("Period {period}").cell()]);
+                    table.push(vec![format!("Period {period}").cell().bold(true)]);
                     for day in 0..day_count {
                         if let Some(class) = timetable.get_class(day, period) {
                             table[period].push((&class.name).cell());
