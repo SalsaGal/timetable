@@ -108,11 +108,15 @@ fn main() {
 
     for class in args.add_class {
         // TODO dont allow duplicate class names
-        timetable.classes.push(Class {
-            name: class,
-            todo: vec![],
-        });
-        changed = true;
+        if timetable.classes.iter().any(|c| c.name == class) {
+            eprintln!("Already has class called {class}");
+        } else {
+            timetable.classes.push(Class {
+                name: class,
+                todo: vec![],
+            });
+            changed = true;
+        }
     }
 
     for period in args.add_period {
